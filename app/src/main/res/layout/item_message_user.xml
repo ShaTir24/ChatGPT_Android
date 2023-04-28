@@ -1,0 +1,30 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="5dp"
+    android:layout_marginBottom="5dp"
+    android:orientation="vertical"
+    android:paddingBottom="5dp">
+
+<LinearLayout
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="75dp"
+    android:layout_gravity="end"
+    android:orientation="vertical"
+    android:padding="12dp"
+    android:background="@drawable/bg_message_user"
+    android:paddingTop="5dp" >
+
+    <TextView
+        android:id="@+id/text_message_user"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:textColor="?colorOnPrimary"
+        android:textSize="18sp"
+        android:textIsSelectable="true" />
+
+</LinearLayout>
+
+</LinearLayout>

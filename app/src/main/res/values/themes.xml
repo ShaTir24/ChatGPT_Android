@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.ChatGPTintegration" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">#4AB7EA</item>
+        <item name="colorPrimaryVariant">#C2E8FF</item>
+        <item name="colorOnPrimary">#1B2227</item>
+        <item name="colorPrimaryContainer">#E7E0FF</item>
+        <item name="colorPrimarySurface">#E7E0FF</item>
+
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">#494365</item>
+        <item name="colorSecondaryVariant">#1C1633</item>
+        <item name="colorOnSecondary">#DDE3E8</item>
+        <item name="colorSecondaryContainer">#384955</item>
+
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor">?attr/colorPrimary</item>
+        <!-- Customize your theme here. -->
+    </style>
+</resources>

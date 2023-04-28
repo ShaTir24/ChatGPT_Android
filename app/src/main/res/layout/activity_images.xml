@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="5dp"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="?colorPrimaryVariant"
+    tools:context=".ImagesActivity">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_gravity="top|center_horizontal"
+        android:layout_marginBottom="10dp">
+
+    <com.google.android.material.button.MaterialButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/capture_btn"
+        android:drawableTop="@android:drawable/ic_menu_camera"
+        android:text="@string/capture_text"
+        android:layout_margin="10dp"
+        android:layout_gravity="center" />
+
+    <com.google.android.material.button.MaterialButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/upload_btn"
+        android:drawableTop="@android:drawable/ic_menu_upload"
+        android:text="@string/upload_text"
+        android:layout_margin="10dp"
+        android:layout_gravity="center" />
+
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/img_view"
+        android:layout_width="match_parent"
+        android:layout_height="350dp"
+        android:src="@drawable/illustrate"
+        android:contentDescription="@string/display_image"
+        android:layout_marginBottom="10dp"
+        android:scaleType="fitCenter"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/submit_img_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:drawableLeft="@android:drawable/ic_menu_send"
+        android:text="@string/submit_img" />
+</LinearLayout>
