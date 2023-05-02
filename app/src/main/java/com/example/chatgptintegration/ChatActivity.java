@@ -50,8 +50,6 @@ public class ChatActivity extends AppCompatActivity {
     private final String accessToken = "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\n";
     private List< Message > mMessages;
     private LinearLayout mProgressBar;
-
-    private String lastGenerated;
     private TextToSpeech tts;
     private FloatingActionButton mButton, mSpeech, mClear;
 

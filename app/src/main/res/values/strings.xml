@@ -18,4 +18,6 @@
     <string name="chat_option">CHAT WITH AI</string>
     <string name="display_image">display image</string>
     <string name="submit_img">SUBMIT</string>
+    <string name="clear">CLEAR</string>
+    <string name="view_btn">VIEW</string>
 </resources>

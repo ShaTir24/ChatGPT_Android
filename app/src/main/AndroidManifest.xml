@@ -22,7 +22,6 @@
         android:required="false" />
 
     <queries>
-        <package android:name="com.google.android.youtube" />
         <package android:name="com.example.chatgptintegration" />
     </queries>
 

@@ -1,55 +1,97 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="5dp"
+    android:background="?colorPrimarySurface"
     android:orientation="vertical"
-    android:gravity="center"
-    android:background="?colorPrimaryVariant"
+    android:padding="5dp"
     tools:context=".ImagesActivity">
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_gravity="top|center_horizontal"
-        android:layout_marginBottom="10dp">
+        android:layout_marginBottom="10dp"
+        android:gravity="center"
+        android:orientation="horizontal">
 
-    <com.google.android.material.button.MaterialButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/capture_btn"
-        android:drawableTop="@android:drawable/ic_menu_camera"
-        android:text="@string/capture_text"
-        android:layout_margin="10dp"
-        android:layout_gravity="center" />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/capture_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start|center"
+            android:layout_marginEnd="10dp"
+            android:drawableLeft="@android:drawable/ic_menu_camera"
+            android:text="@string/capture_text"
+            android:textSize="12sp" />
 
-    <com.google.android.material.button.MaterialButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/upload_btn"
-        android:drawableTop="@android:drawable/ic_menu_upload"
-        android:text="@string/upload_text"
-        android:layout_margin="10dp"
-        android:layout_gravity="center" />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/upload_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|center"
+            android:layout_marginStart="10dp"
+            android:drawableLeft="@android:drawable/ic_menu_upload"
+            android:text="@string/upload_text"
+            android:textSize="12sp" />
 
     </LinearLayout>
 
     <ImageView
         android:id="@+id/img_view"
         android:layout_width="match_parent"
-        android:layout_height="350dp"
-        android:src="@drawable/illustrate"
-        android:contentDescription="@string/display_image"
+        android:layout_height="250dp"
         android:layout_marginBottom="10dp"
-        android:scaleType="fitCenter"/>
+        android:contentDescription="@string/display_image"
+        android:scaleType="fitCenter"
+        android:clickable="true"
+        android:src="@drawable/illustrate" />
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/submit_img_btn"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:drawableLeft="@android:drawable/ic_menu_send"
-        android:text="@string/submit_img" />
+        android:layout_marginTop="10dp"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/submit_img_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:drawableLeft="@android:drawable/ic_input_add"
+            android:layout_marginEnd="10dp"
+            android:text="@string/submit_img"
+            android:enabled="false"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/view_img_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:drawableLeft="@android:drawable/ic_menu_gallery"
+            android:text="@string/view_btn"
+            android:enabled="false"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/reset_img_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:drawableLeft="@android:drawable/ic_delete"
+            android:layout_marginStart="10dp"
+            android:text="@string/clear"
+            android:enabled="false"/>
+
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/res_img_view"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_marginBottom="10dp"
+        android:contentDescription="@string/display_image"
+        android:scaleType="fitCenter"
+        android:visibility="gone" />
+
 </LinearLayout>
