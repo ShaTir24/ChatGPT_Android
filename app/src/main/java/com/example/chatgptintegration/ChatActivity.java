@@ -21,13 +21,16 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
+import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.RetryPolicy;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import org.json.JSONArray;
@@ -42,19 +45,20 @@ import java.util.Map;
 
 public class ChatActivity extends AppCompatActivity {
 
+    private final String apiUrl = "https://api.openai.com/v1/chat/completions";
+    private Map<String, String> headers = new HashMap<>();
+    private final String accessToken = "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";
     private TextView mTextView;
     private RecyclerView mRecyclerView;
     private MessageAdapter mAdapter;
     private EditText mEditText;
-    private final String apiUrl = "https://api.openai.com/v1/chat/completions";
-    private final String accessToken = "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\n";
-    private List< Message > mMessages;
+    private List<Message> mMessages;
     private LinearLayout mProgressBar;
     private TextToSpeech tts;
     private FloatingActionButton mButton, mSpeech, mClear;
 
     public void scrollToBottom() {
-        mRecyclerView.smoothScrollToPosition(mAdapter.getItemCount()-1);
+        mRecyclerView.smoothScrollToPosition(mAdapter.getItemCount() - 1);
     }
 
     public void startProgressWheel() {
@@ -90,9 +94,9 @@ public class ChatActivity extends AppCompatActivity {
         tts = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int status) {
-                if(status == TextToSpeech.SUCCESS) {
+                if (status == TextToSpeech.SUCCESS) {
                     int result = tts.setLanguage(Locale.getDefault());
-                    if(result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                    if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
                         Log.e("TTS", "Language not Supported!");
                     }
                 } else {
@@ -101,7 +105,7 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
 
-        mMessages = new ArrayList< >();
+        mMessages = new ArrayList<>();
         mAdapter = new MessageAdapter(mMessages);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setAdapter(mAdapter);
@@ -128,7 +132,7 @@ public class ChatActivity extends AppCompatActivity {
             public void onScrolled(@NonNull RecyclerView rv, int dx, int dy) {
                 super.onScrolled(rv, dx, dy);
 
-                if(!rv.canScrollVertically(1) && rv.canScrollVertically(-1)) {
+                if (!rv.canScrollVertically(1) && rv.canScrollVertically(-1)) {
                     mButton.setVisibility(View.VISIBLE);
                 }
             }
@@ -164,7 +168,7 @@ public class ChatActivity extends AppCompatActivity {
         mSpeech.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(tts.isSpeaking()) {
+                if (tts.isSpeaking()) {
                     tts.shutdown();
                     mSpeech.setImageResource(R.drawable.speech);
                     return;
@@ -213,17 +217,18 @@ public class ChatActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if(requestCode == 1) {
-            if(resultCode == RESULT_OK && data != null) {
+        if (requestCode == 1) {
+            if (resultCode == RESULT_OK && data != null) {
                 ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
                 mEditText.setText(result.get(0));
                 callAPI();
             }
         }
     }
+
     private void callAPI() {
         String text = mEditText.getText().toString().trim();
-        if(text.equals("")) {
+        if (text.equals("")) {
             Toast.makeText(getApplicationContext(), "Please Enter some text to send", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -250,45 +255,39 @@ public class ChatActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, apiUrl, requestBody, new Response.Listener < JSONObject > () {
-            @Override
-            public void onResponse(JSONObject response) {
-                try {
-                    JSONArray choicesArray = response.getJSONArray("choices");
-                    String text = choicesArray.getJSONObject(0)
-                            .getJSONObject("message")
-                            .getString("content");
-                    Log.e("API Response", response.toString());
-                    //Toast.makeText(MainActivity.this,text,Toast.LENGTH_SHORT).show();
-                    stopProgressWheel();
-                    mSpeech.setVisibility(View.VISIBLE);
-                    mMessages.add(new Message(text.replaceFirst("\n", "").replaceFirst("\n", ""), false));
-                    mAdapter.notifyItemInserted(mMessages.size() - 1);
-                } catch (JSONException e) {
-                    stopProgressWheel();
-                    mSpeech.setVisibility(View.VISIBLE);
-                    Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_SHORT).show();
-                    e.printStackTrace();
-                }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.e("API Error", error.toString());
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, apiUrl, requestBody, response -> {
+            try {
+                JSONArray choicesArray = response.getJSONArray("choices");
+                String text1 = choicesArray.getJSONObject(0)
+                        .getJSONObject("message")
+                        .getString("content");
+                Log.e("API Response", response.toString());
+                //Toast.makeText(MainActivity.this,text,Toast.LENGTH_SHORT).show();
                 stopProgressWheel();
                 mSpeech.setVisibility(View.VISIBLE);
-                Toast.makeText(getApplicationContext(), error.toString(), Toast.LENGTH_SHORT).show();
+                mMessages.add(new Message(text1.replaceFirst("\n", "").replaceFirst("\n", ""), false));
+                mAdapter.notifyItemInserted(mMessages.size() - 1);
+            } catch (JSONException e) {
+                stopProgressWheel();
+                mSpeech.setVisibility(View.VISIBLE);
+                Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_SHORT).show();
+                e.printStackTrace();
             }
+        }, error -> {
+            Log.e("API Error", error.toString());
+            stopProgressWheel();
+            mSpeech.setVisibility(View.VISIBLE);
+            Toast.makeText(getApplicationContext(), error.toString(), Toast.LENGTH_SHORT).show();
         }) {
             @Override
-            public Map< String, String > getHeaders() {
-                Map < String, String > headers = new HashMap< >();
-                headers.put("Authorization", "Bearer " + accessToken);
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                headers.put("Authorization", "Bearer "+accessToken);
                 headers.put("Content-Type", "application/json");
                 return headers;
             }
+
             @Override
-            protected Response < JSONObject > parseNetworkResponse(NetworkResponse response) {
+            protected Response<JSONObject> parseNetworkResponse(NetworkResponse response) {
                 return super.parseNetworkResponse(response);
             }
         };
@@ -296,16 +295,18 @@ public class ChatActivity extends AppCompatActivity {
         RetryPolicy policy = new DefaultRetryPolicy(timeoutMs, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         request.setRetryPolicy(policy);
         // Add the request to the RequestQueue
-        MySingleton.getInstance(this).addToRequestQueue(request);
+//        MySingleton.getInstance(this).addToRequestQueue(request);
+        RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+        queue.add(request);
     }
 
     private void hideKeyboard(@NonNull View view) {
-        InputMethodManager inputMethodManager = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
-        inputMethodManager.hideSoftInputFromWindow(view.getApplicationWindowToken(),0);
+        InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(view.getApplicationWindowToken(), 0);
     }
 
     private String obtainLastText() {
-        LinearLayout layout = (LinearLayout) mRecyclerView.getChildAt(mAdapter.getItemCount()-1);
+        LinearLayout layout = (LinearLayout) mRecyclerView.getChildAt(mAdapter.getItemCount() - 1);
         TextView tv = layout.findViewById(R.id.text_message_bot);
         return tv.getText().toString();
     }

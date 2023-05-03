@@ -19,10 +19,16 @@ public class MainActivity extends AppCompatActivity {
 
         CardView imgCard = findViewById(R.id.img_card);
         CardView chatCard = findViewById(R.id.chat_card);
+        CardView textCard = findViewById(R.id.text_card);
 
         imgCard.setOnClickListener(v -> {
             Intent iScan = new Intent(getApplicationContext(), ImagesActivity.class);
             startActivity(iScan);
+        });
+
+        textCard.setOnClickListener(v -> {
+            Intent iText = new Intent(getApplicationContext(), EditorActivity.class);
+            startActivity(iText);
         });
 
         chatCard.setOnClickListener(v -> {

@@ -20,4 +20,13 @@
     <string name="submit_img">SUBMIT</string>
     <string name="clear">CLEAR</string>
     <string name="view_btn">VIEW</string>
+    <string name="text_editor_hint">Type Text here</string>
+    <string name="bold_btn">BOLD</string>
+    <string name="italics_btn">ITALICS</string>
+    <string name="underline_btn">UNDERLINE</string>
+    <string name="left_align">Left Align</string>
+    <string name="center_align">Center Align</string>
+    <string name="right_align">Right Align</string>
+    <string name="clear_formatting">Clear Formatting</string>
+    <string name="text_editor_card">TEXT EDITOR</string>
 </resources>
