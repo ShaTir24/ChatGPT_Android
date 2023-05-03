@@ -29,4 +29,5 @@
     <string name="right_align">Right Align</string>
     <string name="clear_formatting">Clear Formatting</string>
     <string name="text_editor_card">TEXT EDITOR</string>
+    <string name="generate_pdf">Generate PDF</string>
 </resources>
