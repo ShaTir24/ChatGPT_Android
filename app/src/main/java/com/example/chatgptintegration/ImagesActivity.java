@@ -55,9 +55,9 @@ public class ImagesActivity extends AppCompatActivity {
         outp = findViewById(R.id.output_gen_txt);
 
         Map<String, String> config = new HashMap<>();
-        config.put("cloud_name", "ddlpaws9m");
-        config.put("api_key", "494571888937294");
-        config.put("api_secret", "rAyqgtHXGVHGSAHYli0BhxCRCms");
+        config.put("cloud_name", "your cloud name");
+        config.put("api_key", "your api key");
+        config.put("api_secret", "your api secret");
         Cloudinary cloudinary = new Cloudinary(config);
 
         captureBtn.setOnClickListener(v -> {
