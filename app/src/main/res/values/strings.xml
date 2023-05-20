@@ -11,7 +11,7 @@
     <string name="speak_btn_desc">Read Out Last Generated Text</string>
     <string name="splash_msg">App Introduction Logo</string>
     <string name="mic_info">Press for Voice Input</string>
-    <string name="generating">Generating ...</string>
+    <string name="generating">Generating …</string>
     <string name="upload_text">Select Image</string>
     <string name="capture_text">Capture Image</string>
     <string name="scan_option">SCAN IMAGE</string>
@@ -30,4 +30,6 @@
     <string name="clear_formatting">Clear Formatting</string>
     <string name="text_editor_card">TEXT EDITOR</string>
     <string name="generate_pdf">Generate PDF</string>
+    <string name="generate_btn">Generate Text</string>
+    <string name="delete_btn">Delete</string>
 </resources>

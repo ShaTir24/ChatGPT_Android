@@ -5,8 +5,11 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
+import android.graphics.pdf.PdfDocument;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -44,6 +47,7 @@ public class EditorActivity extends AppCompatActivity {
     EditText textArea;
     private final String filePath = Environment.DIRECTORY_DOCUMENTS;
     private float textSize;
+    private Paint.Align alignType = Paint.Align.LEFT;
 
     @RequiresApi(api = Build.VERSION_CODES.Q)
     @Override
@@ -62,6 +66,7 @@ public class EditorActivity extends AppCompatActivity {
         FloatingActionButton rightAlign = findViewById(R.id.right_aln_btn);
         Button clear = findViewById(R.id.clearButton);
         Button generatePdf = findViewById(R.id.pdfButton);
+
 
         bold.setOnClickListener(v -> {
             Spannable spannableString = new SpannableStringBuilder(textArea.getText());
@@ -111,6 +116,7 @@ public class EditorActivity extends AppCompatActivity {
             //to update the changes on btn click
             Spannable spannableString = new SpannableStringBuilder(textArea.getText());
             textArea.setText(spannableString);
+            alignType = Paint.Align.LEFT;
         });
 
         centerAlign.setOnClickListener(v -> {
@@ -118,6 +124,7 @@ public class EditorActivity extends AppCompatActivity {
             //to update the changes on btn click
             Spannable spannableString = new SpannableStringBuilder(textArea.getText());
             textArea.setText(spannableString);
+            alignType = Paint.Align.CENTER;
         });
 
         rightAlign.setOnClickListener(v -> {
@@ -125,6 +132,7 @@ public class EditorActivity extends AppCompatActivity {
             //to update the changes on btn click
             Spannable spannableString = new SpannableStringBuilder(textArea.getText());
             textArea.setText(spannableString);
+            alignType = Paint.Align.RIGHT;
         });
 
         clear.setOnClickListener(v -> {
@@ -133,24 +141,30 @@ public class EditorActivity extends AppCompatActivity {
         });
 
         generatePdf.setOnClickListener(v -> {
+            Spannable spannableString = new SpannableStringBuilder(textArea.getText());
+            PdfDocument document = new PdfDocument();
+            PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(210, 297, 1).create();
+            PdfDocument.Page page = document.startPage(pageInfo);
+            Canvas canvas = page.getCanvas();
+            // Create a paint object to set the text color and size
+            Paint paint = new Paint();
+            paint.setColor(Color.BLACK);
+            paint.setTextSize(textSize);
+            paint.setTextAlign(alignType);
+            // Draw some text on the page
+            canvas.drawText(spannableString.toString(), 10, 10, paint);
+            // Finish the page
+            document.finishPage(page);
+            // Save the document to a file
             try {
-                Spannable spannableString = new SpannableStringBuilder(textArea.getText());
-                String text = spannableString.toString();
-                byte[] byteArray = text.getBytes();
-                ContentValues values = new ContentValues();
-                values.put(MediaStore.MediaColumns.DISPLAY_NAME, "document1.pdf");
-                values.put(MediaStore.MediaColumns.MIME_TYPE, "application/pdf");
-                values.put(MediaStore.MediaColumns.RELATIVE_PATH, filePath);
-
-                ContentResolver contentResolver = getContentResolver();
-                Uri uri = contentResolver.insert(MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL), values);
-                OutputStream outputStream = contentResolver.openOutputStream(uri);
-                outputStream.write(byteArray);
-                outputStream.close();
-                Toast.makeText(this, "PDF file saved at path: " + filePath, Toast.LENGTH_SHORT).show();
+                File file = new File(filePath, "my_document.pdf");
+                FileOutputStream outputStream = new FileOutputStream(file);
+                document.writeTo(outputStream);
+                document.close();
+                Toast.makeText(this, "File Saved Successfully", Toast.LENGTH_SHORT).show();
             } catch (IOException e) {
-                Log.d("TAG", String.valueOf(e));
-                Toast.makeText(this, "Error ocurred saving the file", Toast.LENGTH_SHORT).show();
+                e.printStackTrace();
+                Toast.makeText(this, "File Save Error occurred", Toast.LENGTH_SHORT).show();
             }
         });
     }

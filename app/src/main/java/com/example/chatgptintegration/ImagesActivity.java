@@ -1,58 +1,64 @@
 package com.example.chatgptintegration;
 
-import static java.lang.System.out;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.annotation.SuppressLint;
-import android.content.ContentValues;
 import android.content.Intent;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteException;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
+import android.text.method.ScrollingMovementMethod;
 import android.widget.Toast;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import com.google.android.material.button.MaterialButton;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ImagesActivity extends AppCompatActivity {
-
     private final int GALLERY_REQ_CODE = 201;
     private final int CAMERA_REQ_CODE = 101;
-    private int count_stored = 0;
-    private long id;
-    ImageView iv1, iv2;
-    MaterialButton submitBtn, viewBtn, clearBtn;
+    ImageView iv1;
+    TextView outp;
+    MaterialButton submitBtn, generateBtn, clearBtn;
     MyDatabaseHelper dbHelper;
+    Bitmap bitImg;
+    String imageUrl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_images);
 
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+
         MaterialButton captureBtn = findViewById(R.id.capture_btn);
         MaterialButton uploadBtn = findViewById(R.id.upload_btn);
         submitBtn = findViewById(R.id.submit_img_btn);
-        viewBtn = findViewById(R.id.view_img_btn);
+        generateBtn = findViewById(R.id.generate_txt_btn);
         clearBtn = findViewById(R.id.reset_img_btn);
         iv1 = findViewById(R.id.img_view);
-        iv2 = findViewById(R.id.res_img_view);
+        outp = findViewById(R.id.output_gen_txt);
 
-        dbHelper = new MyDatabaseHelper(this);
+        Map<String, String> config = new HashMap<>();
+        config.put("cloud_name", "ddlpaws9m");
+        config.put("api_key", "494571888937294");
+        config.put("api_secret", "rAyqgtHXGVHGSAHYli0BhxCRCms");
+        Cloudinary cloudinary = new Cloudinary(config);
 
         captureBtn.setOnClickListener(v -> {
             Intent iCam = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -73,60 +79,68 @@ public class ImagesActivity extends AppCompatActivity {
 
         submitBtn.setOnClickListener(v -> {
             //getting the bitmap of an image from imageView
-            Bitmap bitImg = ((BitmapDrawable)iv1.getDrawable()).getBitmap();
-
-            //compressing bitmap image into a byte array
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            bitImg.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
-            byte[] imgBytes = outputStream.toByteArray();
+            bitImg = ((BitmapDrawable)iv1.getDrawable()).getBitmap();
 
             //inserting image byte array into database
-            try (SQLiteDatabase db = dbHelper.getWritableDatabase()) {
-                ContentValues values = new ContentValues();
-                values.put("name", "Tirth");
-                values.put("image_data", imgBytes);
-                id = db.insertOrThrow("my_table", null, values);
-                count_stored++;
-                Log.d("TAG", "Image Inserted Into Database");
-                Toast.makeText(getApplicationContext(), "Image Inserted Into Database", Toast.LENGTH_SHORT).show();
-                viewBtn.setEnabled(true);
+            try {
+                // Upload image to Cloudinary
+                cloudinary.uploader().upload(bitmapToBytes(bitImg), ObjectUtils.emptyMap());
+                generateBtn.setEnabled(true);
+            } catch (IOException e) {
+                Toast.makeText(this, "Error Occurred while storing the image into database.", Toast.LENGTH_SHORT).show();
+                e.printStackTrace();
+            }
+
+            Map<?, ?> uploadResult;
+            try {
+                uploadResult = cloudinary.uploader().upload(bitmapToBytes(bitImg), ObjectUtils.emptyMap());
+                imageUrl = (String) uploadResult.get("secure_url");
+                generateBtn.setEnabled(true);
                 clearBtn.setEnabled(true);
-                submitBtn.setEnabled(false);
-                Toast.makeText(this, String.valueOf(count_stored), Toast.LENGTH_SHORT).show();
-            } catch (SQLiteException e) {
-                Log.e("TAG", "Error inserting data into database", e);
-                Toast.makeText(getApplicationContext(), "Error Occurred while inserting image into database", Toast.LENGTH_SHORT).show();
+            } catch (IOException e) {
+                Toast.makeText(this, "Unable to get the URL of the image at this time. Please try again later.", Toast.LENGTH_SHORT).show();
+                e.printStackTrace();
             }
         });
 
-        viewBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                byte[] imageData = getImageDataFromDB();
-                Bitmap bitmap = BitmapFactory.decodeByteArray(imageData, 0, imageData.length);
-                iv2.setImageBitmap(bitmap);
-                iv2.setVisibility(View.VISIBLE);
-                viewBtn.setEnabled(false);
+        generateBtn.setOnClickListener(v -> {
+            String url = "https://tirth24.pythonanywhere.com/";
+            JSONObject reqObj = new JSONObject();
+            try {
+                reqObj.put("url", imageUrl);
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
             }
-
-            private byte[] getImageDataFromDB() {
-                byte[] byteArray = {0};
-                try (SQLiteDatabase db = dbHelper.getReadableDatabase()) {
-                    String query = "SELECT image_data FROM my_table WHERE _id = ?";
-                    Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(id)});
-                    if(cursor.moveToFirst()) {
-                        byteArray = cursor.getBlob(cursor.getColumnIndexOrThrow("image_data"));
-                    }
-                    cursor.close();
-                    return byteArray;
-
-                } catch(SQLiteException e) {
-                    Toast.makeText(ImagesActivity.this, "Error in Fetching image from Database", Toast.LENGTH_SHORT).show();
-                    Log.e("TAG", "Error Fetching the Image Byte Array from Database");
-                }
-                return byteArray;
+            String response = HttpUtils.sendPostRequest(url, reqObj);
+            if(response != null) {
+                outp.setText(response);
+                outp.setMovementMethod(new ScrollingMovementMethod());
             }
         });
+
+        clearBtn.setOnClickListener(v -> {
+            try {
+                cloudinary.uploader().destroy(getPublicId(imageUrl), ObjectUtils.emptyMap());
+                Toast.makeText(this, "The image has been successfully removed from database.", Toast.LENGTH_SHORT).show();
+            } catch (IOException e) {
+                Toast.makeText(this, "An error occurred while removing the image from database.", Toast.LENGTH_SHORT).show();
+                e.printStackTrace();
+            }
+        });
+    }
+
+    private String getPublicId(String imageUrl) {
+        //Extract the public ID from the image URL
+        Uri uri = Uri.parse(imageUrl);
+        List<String> segments = uri.getPathSegments();
+        String publicIdWithExtension = segments.get(segments.size() - 1);
+        return publicIdWithExtension.substring(0, publicIdWithExtension.lastIndexOf("."));
+    }
+
+    private byte[] bitmapToBytes(Bitmap bitImg) {
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bitImg.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+        return stream.toByteArray();
     }
 
     @Override
